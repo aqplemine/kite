@@ -14,6 +14,45 @@ type NodeInfo = {
   creditsCost: number | null;
 };
 
+
+/**
+ * Show the value sent to Discord as an integer in the docs. The editor still
+ * stores numeric text or a placeholder, which the service converts to seconds.
+ * This changes only the viewer, not the saved flow's input schema.
+ */
+function schemaForDocs(
+  schema: JsonSchema7Type,
+  type: string,
+  tab: "data" | "result"
+): JsonSchema7Type {
+  if (
+    type !== "action_member_ban" ||
+    tab !== "data" ||
+    typeof schema !== "object" ||
+    !schema.properties
+  ) {
+    return schema;
+  }
+
+  const field = schema.properties.member_ban_delete_message_duration_seconds;
+  if (!field || typeof field !== "object") return schema;
+
+  return {
+    ...schema,
+    properties: {
+      ...schema.properties,
+      member_ban_delete_message_duration_seconds: {
+        ...field,
+        anyOf: undefined,
+        type: "integer",
+        description:
+          (field.description ?? "") +
+          " Enter a number or a {{ }} expression; Kite sends an integer to Discord.",
+      },
+    },
+  };
+}
+
 export default function NodeInfoExplorer({ type }: { type: string }) {
   const [tab, setTab] = useState<"data" | "result">("result");
   const [data, setData] = useState<NodeInfo | null>(null);
@@ -58,6 +97,7 @@ export default function NodeInfoExplorer({ type }: { type: string }) {
   }
 
   const schema = tab === "data" ? data.dataSchema : data.resultSchema;
+  const displaySchema = schema && schemaForDocs(schema, type, tab);
 
   return (
     <div>
@@ -89,7 +129,7 @@ export default function NodeInfoExplorer({ type }: { type: string }) {
       </div>
 
       <div className="bg-zinc-100 dark:bg-zinc-800 px-6 py-3 rounded-lg">
-        {schema && <JsonSchemaExplorer schema={schema} />}
+        {displaySchema && <JsonSchemaExplorer schema={displaySchema} />}
       </div>
     </div>
   );
