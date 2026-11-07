@@ -22555,3 +22555,16 @@ textarea {
     width: max-content;
   }
 }
+
+/* Long block setting names must not overlap their type or description. */
+.json-schema-explorer :has(> [data-test^="property-name-"]) {
+  flex-wrap: wrap;
+  min-width: 0;
+  row-gap: 4px;
+}
+
+.json-schema-explorer [data-test^="property-name-"] {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
