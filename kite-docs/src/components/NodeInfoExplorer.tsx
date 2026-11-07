@@ -24,11 +24,17 @@ function schemaForDocs(
   type: string,
   tab: "data" | "result"
 ): JsonSchema7Type {
-  if (type !== "action_member_ban" || tab !== "data" || typeof schema !== "object") {
+  if (
+    type !== "action_member_ban" ||
+    tab !== "data" ||
+    typeof schema !== "object"
+  ) {
     return schema;
   }
 
-  const properties = (schema as { properties?: Record<string, JsonSchema7Type> }).properties;
+  const properties = (
+    schema as { properties?: Record<string, JsonSchema7Type> }
+  ).properties;
   const field = properties?.member_ban_delete_message_duration_seconds;
   if (!field || typeof field !== "object") return schema;
 
