@@ -14,7 +14,6 @@ type NodeInfo = {
   creditsCost: number | null;
 };
 
-
 /**
  * Show the value sent to Discord as an integer in the docs. The editor still
  * stores numeric text or a placeholder, which the service converts to seconds.
@@ -25,22 +24,18 @@ function schemaForDocs(
   type: string,
   tab: "data" | "result"
 ): JsonSchema7Type {
-  if (
-    type !== "action_member_ban" ||
-    tab !== "data" ||
-    typeof schema !== "object" ||
-    !schema.properties
-  ) {
+  if (type !== "action_member_ban" || tab !== "data" || typeof schema !== "object") {
     return schema;
   }
 
-  const field = schema.properties.member_ban_delete_message_duration_seconds;
+  const properties = (schema as { properties?: Record<string, JsonSchema7Type> }).properties;
+  const field = properties?.member_ban_delete_message_duration_seconds;
   if (!field || typeof field !== "object") return schema;
 
   return {
     ...schema,
     properties: {
-      ...schema.properties,
+      ...properties,
       member_ban_delete_message_duration_seconds: {
         ...field,
         anyOf: undefined,
